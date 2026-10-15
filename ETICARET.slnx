@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ETICARET.DataAccess/ETICARET.DataAccess.csproj" />
+  <Project Path="ETICARET.Entities/ETICARET.Entities.csproj" />
+</Solution>
