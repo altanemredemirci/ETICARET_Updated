@@ -24,7 +24,7 @@ namespace ETICARET.DataAccess
             // DI container EfCoreProductDal oluşturup verir.
 
             services.AddScoped<IProductDal, EfCoreProductDal>();
-            //services.AddScoped<ICategoryDal, EfCoreCategoryDal>();
+            services.AddScoped<ICategoryDal, EfCoreCategoryDal>();
 
 
         }

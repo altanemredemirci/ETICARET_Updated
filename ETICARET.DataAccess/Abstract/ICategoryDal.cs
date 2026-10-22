@@ -8,7 +8,7 @@ namespace ETICARET.DataAccess.Abstract
 {
     public interface ICategoryDal:IRepository<Category>
     {
-        Task<List<CategoryWithCount>> GetAllWithCountAsync();
-        Task<Category> GetWithProductAsync();
+        Task<List<CategoryWithCount>> GetAllWithCountAsync(); //Kategori içindeki ürün adeti
+        Task<Category> GetWithProductAsync(int id); //Kategori ile birlikte ürünleri çek
     }
 }
