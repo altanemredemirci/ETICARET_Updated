@@ -1,8 +1,115 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using ETICARET.WebUI.Extensions
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+
+    <section class="hero">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <span class="hero-eyebrow"><i class="bi bi-stars"></i> Yeni sezon ürünleri geldi</span>
+                <h1>Teknolojiden mutfağa, aradığın her şey burada.</h1>
+                <p>Telefon, bilgisayar, beyaz eşya ve çok daha fazlası. Güvenli ödeme, ücretsiz kargo ve 14 gün içinde kolay iade.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-hero btn-lg" asp-controller="Shop" asp-action="List" asp-route-category="">
+                        Alışverişe Başla <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                    <a class="btn btn-hero-ghost btn-lg" asp-controller="Shop" asp-action="List" asp-route-category="" asp-route-sort="Newest">
+                        Yeni Gelenler
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div><strong>@Model.Categories.Sum(c => c.ProductCount)+</strong><span>Ürün</span></div>
+                    <div><strong>@Model.Categories.Count</strong><span>Kategori</span></div>
+                    <div><strong>%100</strong><span>Güvenli ödeme</span></div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="hero-card hero-card--1"><img src="~/img/products/iphone-17-pro-max-1.jpg" alt="" /></div>
+                    <div class="hero-card hero-card--2"><img src="~/img/products/macbook-air-m4-1.jpg" alt="" /></div>
+                    <div class="hero-card hero-card--3"><img src="~/img/products/playstation-5-slim-1.webp" alt="" /></div>
+                    <div class="hero-tag"><i class="bi bi-lightning-charge-fill"></i> Aynı gün kargoda</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" aria-label="Avantajlar">
+        <div class="feature">
+            <span class="feature-icon"><i class="bi bi-truck"></i></span>
+            <div><strong>Ücretsiz Kargo</strong><span>Bütün siparişlerde</span></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon"><i class="bi bi-shield-lock"></i></span>
+            <div><strong>Güvenli Ödeme</strong><span>Iyzico altyapısı</span></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon"><i class="bi bi-arrow-repeat"></i></span>
+            <div><strong>Kolay İade</strong><span>14 gün içinde</span></div>
+        </div>
+        <div class="feature">
+            <span class="feature-icon"><i class="bi bi-headset"></i></span>
+            <div><strong>Müşteri Desteği</strong><span>Hafta içi 09:00 – 18:00</span></div>
+        </div>
+    </section>
+
+    <div class="section-head">
+        <div>
+            <h2>Kategoriler</h2>
+            <p>İhtiyacına göre keşfetmeye başla</p>
+        </div>
+    </div>
+    <div class="category-grid">
+        @foreach (var category in Model.Categories)
+        {
+            <a class="category-card" asp-controller="Shop" asp-action="List" asp-route-category="@category.Name">
+                <span class="category-thumb">
+                    <img src="@ProductExtensions.ImagePath(category.ImageUrl)" alt="" loading="lazy" />
+                </span>
+                <strong>@category.Name</strong>
+                <span>@category.ProductCount ürün</span>
+            </a>
+        }
+    </div>
+
+    <div class="section-head">
+        <div>
+            <h2>Öne Çıkan Ürünler</h2>
+            <p>Editörlerimizin seçtikleri</p>
+        </div>
+        <a class="link-more" asp-controller="Shop" asp-action="List" asp-route-category="">Tümünü gör <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <partial name="_ProductGrid" model="Model.FeaturedProducts" />
+
+    <section class="promo-banner">
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div>
+                <h3>Siparişlerin bir tık uzağında</h3>
+                <p>Verdiğin siparişlerin durumunu "Siparişlerim" sayfasından takip edebilirsin.</p>
+            </div>
+            <a class="btn btn-hero btn-lg" asp-controller="Order" asp-action="Index">Siparişlerim</a>
+        }
+        else
+        {
+            <div>
+                <h3>Hemen üye ol, alışverişe başla</h3>
+                <p>Üyelik ücretsiz. Sepetin her cihazda seninle, siparişlerin tek ekranda.</p>
+            </div>
+            <a class="btn btn-hero btn-lg" asp-controller="Account" asp-action="Register">Ücretsiz Üye Ol</a>
+        }
+    </section>
+
+    <div class="section-head">
+        <div>
+            <h2>Yeni Eklenenler</h2>
+            <p>Mağazaya en son eklenen ürünler</p>
+        </div>
+        <a class="link-more" asp-controller="Shop" asp-action="List" asp-route-category="" asp-route-sort="Newest">Tümünü gör <i class="bi bi-arrow-right"></i></a>
+    </div>
+     @* <partial name="_ProductGrid" model="Model.LatestProducts" /> *@
+
 </div>

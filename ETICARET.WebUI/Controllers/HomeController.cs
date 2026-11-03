@@ -1,25 +1,23 @@
+using ETICARET.Business.Abstract;
 using ETICARET.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace ETICARET.WebUI.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(IProductService productService,ICategoryService categoryService) : Controller
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var model = new HomeViewModel(
+                Categories: await categoryService.GetAllWithCountAsync(),
+                FeaturedProducts: await productService.GetHomeProductsAsync(),
+                LastestProducts: await productService.GetLatestAsync(5));
+
+            return View(model);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+     
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }

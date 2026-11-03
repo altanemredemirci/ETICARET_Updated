@@ -1,0 +1,13 @@
+﻿@using ETICARET.WebUI.Extensions
+@* Bildirimler. Controller'da Notify("...") ile TempData'ya yazılan mesaj burada okunur
+   (TempData okununca silinir) ve wwwroot/js/site.js tarafından toast olarak gösterilir. *@
+@{
+    var notify = TempData.Get<NotifyMessage>(NotifyMessage.Key);
+}
+
+<div id="toast-container" class="toast-container position-fixed end-0 p-3"></div>
+
+@if (notify is not null)
+{
+    <div id="server-notify" hidden data-text="@notify.Text" data-type="@notify.Type"></div>
+}

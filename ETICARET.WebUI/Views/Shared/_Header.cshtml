@@ -1,0 +1,80 @@
+﻿﻿@using ETICARET.Entities.Identity
+@{
+    var isSignedIn = User.Identity?.IsAuthenticated == true;
+    // Giriş sonrası kullanıcı bulunduğu sayfaya dönsün (hesap sayfalarında gerek yok)
+    string? returnUrl = Context.Request.Path.StartsWithSegments("/Account")
+        ? null
+        : $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+<div class="topbar d-none d-md-block">
+    <div class="container">
+        <span><i class="bi bi-truck"></i>Bütün siparişlerde ücretsiz kargo</span>
+        <span><i class="bi bi-shield-check"></i>Iyzico ile güvenli ödeme · 14 gün içinde kolay iade</span>
+    </div>
+</div>
+
+<header class="site-header">
+    <div class="container header-main">
+        @* asp-area="" → Yönetim panelinden gelinse bile ana siteye link üretilir *@
+        <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+            <span class="brand-mark"><i class="bi bi-bag-heart-fill"></i></span>
+            ESHOPPER
+        </a>
+
+        <form class="header-search" role="search" method="get"
+              asp-area="" asp-controller="Shop" asp-action="List" asp-route-category="">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" value="@Context.Request.Query["q"]"
+                   placeholder="Ürün, marka veya kategori ara..." aria-label="Ürün ara" />
+            <button class="btn btn-primary btn-sm" type="submit">Ara</button>
+        </form>
+
+        <nav class="header-actions" aria-label="Hesap">
+            @if (isSignedIn)
+            {
+                <div class="dropdown">
+                    <button class="header-action dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i>
+                        <span class="d-none d-md-inline">@User.Identity!.Name</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile"><i class="bi bi-person"></i>Profilim</a></li>
+                        <li><a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="Index"><i class="bi bi-box-seam"></i>Siparişlerim</a></li>
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2"></i>Yönetim Paneli</a></li>
+                        }
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            @* Çıkış POST ile yapılır (form tag helper CSRF token'ını kendisi ekler) *@
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right"></i>Çıkış Yap</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <a class="header-action" asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                    <i class="bi bi-person"></i><span class="d-none d-md-inline">Giriş Yap</span>
+                </a>
+                <a class="btn btn-primary btn-sm d-none d-sm-inline-flex" asp-area="" asp-controller="Account" asp-action="Register">Üye Ol</a>
+            }
+
+            <a class="header-action" asp-area="" asp-controller="Cart" asp-action="Index" aria-label="Sepetim">
+                <i class="bi bi-bag"></i>
+                @* @await Component.InvokeAsync("CartBadge") *@
+                <span class="d-none d-md-inline">Sepetim</span>
+            </a>
+        </nav>
+    </div>
+
+    <nav class="category-bar" aria-label="Kategoriler">
+        <div class="container">
+            @* View Component: kategorileri kendisi veritabanından çeker *@
+            @* @await Component.InvokeAsync("CategoryMenu") *@
+        </div>
+    </nav>
+</header>

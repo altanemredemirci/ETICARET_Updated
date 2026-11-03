@@ -1,0 +1,45 @@
+﻿<footer class="site-footer">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <a class="brand mb-3" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark"><i class="bi bi-bag-heart-fill"></i></span>
+                    ESHOPPER
+                </a>
+                <p class="mb-0" style="max-width: 22rem">
+                    ASP.NET Core 10 MVC ile katmanlı mimaride geliştirilmiş örnek e-ticaret uygulaması.
+                </p>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6>Alışveriş</h6>
+                <ul>
+                    <li><a asp-area="" asp-controller="Shop" asp-action="List" asp-route-category="">Tüm Ürünler</a></li>
+                    <li><a asp-area="" asp-controller="Shop" asp-action="List" asp-route-category="" asp-route-sort="Newest">Yeni Gelenler</a></li>
+                    <li><a asp-area="" asp-controller="Cart" asp-action="Index">Sepetim</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6>Hesabım</h6>
+                <ul>
+                    <li><a asp-area="" asp-controller="Account" asp-action="Profile">Profilim</a></li>
+                    <li><a asp-area="" asp-controller="Order" asp-action="Index">Siparişlerim</a></li>
+                    <li><a asp-area="" asp-controller="Account" asp-action="Register">Üye Ol</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h6>İletişim</h6>
+                <ul>
+                    <li><i class="bi bi-envelope me-2"></i>destek@eticaret.com</li>
+                    <li><i class="bi bi-telephone me-2"></i>0850 000 00 00</li>
+                    <li><i class="bi bi-clock me-2"></i>Hafta içi 09:00 – 18:00</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© @DateTime.Now.Year ETİCARET · Eğitim projesi</span>
+            <div class="pay-logos" aria-label="Ödeme yöntemleri">
+                <span>VISA</span><span>Mastercard</span><span>TROY</span><span>iyzico</span>
+            </div>
+        </div>
+    </div>
+</footer>

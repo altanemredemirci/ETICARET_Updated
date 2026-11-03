@@ -1,0 +1,49 @@
+﻿@model Product
+@* Ürün kartı. CoverImage, InStock, IsLowStock → Extensions/ProductExtensions.cs (C# 14 extension property)
+   ToTL() → Extensions/FormatExtensions.cs *@
+@{
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+<article class="product-card">
+    <a class="product-media @(Model.InStock ? "" : "is-soldout")"
+       asp-area="" asp-controller="Shop" asp-action="Details" asp-route-id="@Model.Id">
+        <img src="@Model.CoverImage" alt="@Model.Name" loading="lazy" />
+        @if (!Model.InStock)
+        {
+            <span class="product-badge product-badge--soldout">Tükendi</span>
+        }
+        else if (Model.IsLowStock)
+        {
+            <span class="product-badge product-badge--low">Son @Model.Stock ürün</span>
+        }
+    </a>
+
+    <div class="product-body">
+        <a class="product-title" title="@Model.Name"
+           asp-area="" asp-controller="Shop" asp-action="Details" asp-route-id="@Model.Id">@Model.Name</a>
+        <div class="product-price">@Model.Price.ToTL()</div>
+        <div class="product-ship"><i class="bi bi-truck"></i> Ücretsiz kargo</div>
+    </div>
+
+    <div class="product-actions">
+        @if (!Model.InStock)
+        {
+            <button class="btn btn-light" type="button" disabled><i class="bi bi-slash-circle"></i> Stokta yok</button>
+        }
+        else if (User.Identity?.IsAuthenticated == true)
+        {
+            <form asp-area="" asp-controller="Cart" asp-action="Add" method="post">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button class="btn btn-primary" type="submit"><i class="bi bi-bag-plus"></i> Sepete Ekle</button>
+            </form>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary" asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                <i class="bi bi-bag-plus"></i> Sepete Ekle
+            </a>
+        }
+    </div>
+</article>

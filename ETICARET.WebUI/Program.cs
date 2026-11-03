@@ -1,6 +1,10 @@
 using ETICARET.Business;
 using ETICARET.DataAccess;
+using ETICARET.DataAccess.Concrete.EfCore;
+using ETICARET.Entities.Identity;
 using ETICARET.WebUI.Data;
+using ETICARET.WebUI.Infrastucture;
+using Microsoft.AspNetCore.Identity;
 using System.Globalization;
 
 namespace ETICARET.WebUI
@@ -20,6 +24,39 @@ namespace ETICARET.WebUI
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.User.RequireUniqueEmail = true;
+                //options.User.AllowedUserNameCharacters += "çğşı";
+
+                options.SignIn.RequireConfirmedEmail = true;
+
+            })
+                .AddEntityFrameworkStores<ETicaretContext>()
+                .AddDefaultTokenProviders()
+                .AddErrorDescriber<TurkishIdentityErrorDescriber>();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.ExpireTimeSpan = TimeSpan.FromHours(2);
+                options.SlidingExpiration = true;
+                options.Cookie.Name = ".Eticaret.Auth";
+                options.Cookie.HttpOnly = true;
+            });
+
 
             var app = builder.Build();
 
