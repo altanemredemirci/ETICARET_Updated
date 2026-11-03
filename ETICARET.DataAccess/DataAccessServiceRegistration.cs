@@ -22,11 +22,10 @@ namespace ETICARET.DataAccess
 
             // Interface → Sınıf eşleştirmesi. Controller/Manager "IProductDal ver" dediğinde
             // DI container EfCoreProductDal oluşturup verir.
-
             services.AddScoped<IProductDal, EfCoreProductDal>();
             services.AddScoped<ICategoryDal, EfCoreCategoryDal>();
 
-
+            return services;
         }
     }
 }
