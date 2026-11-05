@@ -15,6 +15,7 @@ namespace ETICARET.Business
             // Scoped: Her HTTP isteğinde yeni nesne, istek boyunca aynı nesne.
             services.AddScoped<IProductService, ProductManager>();
             services.AddScoped<ICategoryService, CategoryManager>();
+            services.AddScoped<IEmailService, SmtpEmailService>();
 
             return services;
         }

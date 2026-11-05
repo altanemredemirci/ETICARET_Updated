@@ -1,0 +1,75 @@
+﻿@model LoginModel
+@inject IWebHostEnvironment Environment
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="brand-mark"><i class="bi bi-bag-heart-fill"></i></div>
+        <h1>Tekrar hoş geldiniz</h1>
+        <p class="lead-text">Hesabınıza giriş yapın</p>
+
+        <form asp-action="Login" method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-envelope"></i>
+                    <input asp-for="Email" class="form-control" placeholder="ornek@eposta.com" autocomplete="email" autofocus />
+                </div>
+                <span asp-validation-for="Email"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <label asp-for="Password" class="form-label"></label>
+                    <a class="small" asp-action="ForgotPassword">Şifremi unuttum</a>
+                </div>
+                <div class="input-icon">
+                    <i class="bi bi-lock"></i>
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                    <button type="button" class="toggle-password" aria-label="Şifreyi göster"><i class="bi bi-eye"></i></button>
+                </div>
+                <span asp-validation-for="Password"></span>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100" type="submit">Giriş Yap</button>
+        </form>
+
+        @* Hesap onaylanmamışsa (AccountController.Login → ViewData["ShowResend"]) onay mailini yeniden isteme *@
+        @if (ViewData["ShowResend"] is true)
+        {
+            <form asp-action="ResendConfirmation" method="post" class="mt-3">
+                <input type="hidden" name="email" value="@Model.Email" />
+                <button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-send"></i> Onay e-postasını tekrar gönder</button>
+            </form>
+        }
+
+        <div class="auth-footer">
+            Hesabınız yok mu? <a asp-action="Register">Ücretsiz üye olun</a>
+        </div>
+
+        @* Sadece geliştirme ortamında: appsettings.json → SeedUsers hesaplarını hatırlatır *@
+        @if (Environment.IsDevelopment())
+        {
+            <div class="demo-accounts">
+                <strong class="d-block mb-1"><i class="bi bi-info-circle"></i> Hazır hesaplar (geliştirme)</strong>
+                Yönetici: <code>@Configuration["SeedUsers:Admin:Email"]</code> / <code>@Configuration["SeedUsers:Admin:Password"]</code><br />
+                Müşteri: <code>@Configuration["SeedUsers:Customer:Email"]</code> / <code>@Configuration["SeedUsers:Customer:Password"]</code>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

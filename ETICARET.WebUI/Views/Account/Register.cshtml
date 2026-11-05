@@ -1,0 +1,73 @@
+﻿@model RegisterModel
+@{
+    ViewData["Title"] = "Üye Ol";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="brand-mark"><i class="bi bi-person-plus-fill"></i></div>
+        <h1>Hesap oluşturun</h1>
+        <p class="lead-text">Bir dakikada üye olun, alışverişe başlayın</p>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-person"></i>
+                    <input asp-for="FullName" class="form-control" autocomplete="name" autofocus />
+                </div>
+                <span asp-validation-for="FullName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-at"></i>
+                    <input asp-for="UserName" class="form-control" autocomplete="username" />
+                </div>
+                <span asp-validation-for="UserName"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-envelope"></i>
+                    <input asp-for="Email" class="form-control" placeholder="ornek@eposta.com" autocomplete="email" />
+                </div>
+                <span asp-validation-for="Email"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-lock"></i>
+                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                    <button type="button" class="toggle-password" aria-label="Şifreyi göster"><i class="bi bi-eye"></i></button>
+                </div>
+                <div class="form-text">En az 8 karakter; büyük harf, küçük harf, rakam ve özel karakter (. ! * gibi) içermeli.</div>
+                <span asp-validation-for="Password"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <div class="input-icon">
+                    <i class="bi bi-lock"></i>
+                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                </div>
+                <span asp-validation-for="ConfirmPassword"></span>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-100" type="submit">Üye Ol</button>
+        </form>
+
+        <div class="auth-footer">
+            Zaten üye misiniz? <a asp-action="Login">Giriş yapın</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
