@@ -89,7 +89,7 @@ namespace ETICARET.WebUI.Controllers
         private async Task<bool> SendConfirmationEmailAsync(ApplicationUser user)
         {
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            // Request.Scheme verilince tam adres üretilir: https://localhost:7296/Account/ConfirmEmail?userId=...&token=...
+            // Request.Scheme verilince tam adres üretilir: https://localhost:7249/Account/ConfirmEmail?userId=...&token=...
             var link = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, token }, Request.Scheme)!;
 
             return await emailService.SendAsync(user.Email!, "ETİCARET hesabınızı onaylayın",

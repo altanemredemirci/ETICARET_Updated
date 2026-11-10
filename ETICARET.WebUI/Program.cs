@@ -1,4 +1,5 @@
 using ETICARET.Business;
+using ETICARET.Business.Settings;
 using ETICARET.DataAccess;
 using ETICARET.DataAccess.Concrete.EfCore;
 using ETICARET.Entities.Identity;
@@ -24,6 +25,8 @@ namespace ETICARET.WebUI
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
