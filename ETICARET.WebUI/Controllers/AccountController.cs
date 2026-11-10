@@ -49,8 +49,6 @@ namespace ETICARET.WebUI.Controllers
             return View(model);
         }
 
-
-
         public IActionResult Register() => View(new RegisterModel());
 
         [HttpPost]
@@ -127,6 +125,99 @@ namespace ETICARET.WebUI.Controllers
           <p style="color:#64748b;font-size:13px">Bu işlemi siz yapmadıysanız bu e-postayı dikkate almayın.</p>
         </div>
         """;
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await signInManager.SignOutAsync();
+            Notify("Oturumunuz kapatıldı.", "info");
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendConfirmation(string? email)
+        {
+            var user = string.IsNullOrWhiteSpace(email) ? null : await userManager.FindByEmailAsync(email);
+
+            var sent = true;
+            if(user is not null && !await userManager.IsEmailConfirmedAsync(user))
+            {
+                sent = await SendConfirmationEmailAsync(user);
+            }
+
+            if(!sent && environment.IsDevelopment())
+            {
+                Notify("E-posta gönderilemedi. Onay bağlantısı uygulama konsoluna yazıldı (hata mesajı)", "warning");
+            }
+            else
+            {
+                Notify("Bu adres kayıtlı ve onaylanmamışsa onay bağlantısı yeniden gönderildi.", "info");
+            }
+
+            return RedirectToAction(nameof(Login));
+        }
+
+        public IActionResult ForgotPassword() => View(new ForgotPasswordModel());
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user is not null && await userManager.IsEmailConfirmedAsync(user))
+            {
+                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                var link = Url.Action(nameof(ResetPassword), "Account", new { token, email = user.Email }, Request.Scheme)!;
+
+                await emailService.SendAsync(user.Email!, "ETİCARET şifre sıfırlama",
+                    EmailTemplate(user.FullName, "Şifrenizi sıfırlamak için aşağıdaki butona tıklayın.", "Şifremi Sıfırla", link));
+            }
+
+            // Güvenlik: E-postanın sistemde kayıtlı olup olmadığını belli etmiyoruz (her durumda aynı mesaj).
+            Notify("Bu adres kayıtlıysa şifre sıfırlama bağlantısı gönderildi.", "info");
+            return RedirectToAction(nameof(Login));
+        }
+
+        public IActionResult ResetPassword(string? token, string? email)
+        {
+            if (token is null)
+                return RedirectToAction("Index", "Home");
+
+            return View(new ResetPasswordModel { Token = token, Email = email ?? string.Empty });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await userManager.FindByEmailAsync(model.Email);
+
+            if(user is null)
+            {
+                ModelState.AddModelError(string.Empty, "Bağlantı süresi dolmuş veya geçersiz");
+
+                return View(model);
+            }
+
+            var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                    return View(model);
+                }
+            }
+
+            Notify("Şifreniz güncellendi. Yeni şifrenizle giriş yapabilirsiniz.");
+            return RedirectToAction(nameof(Login));
+
+        }
     }
 
 }
