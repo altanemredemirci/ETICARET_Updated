@@ -1,0 +1,14 @@
+﻿@* Hesap sayfalarının sol menüsü (Profil, Şifre, Siparişler) *@
+@{
+    var current = $"{ViewContext.RouteData.Values["controller"]}/{ViewContext.RouteData.Values["action"]}";
+    string Active(string page) => current == page ? "active" : "";
+}
+
+<div class="surface">
+    <ul class="menu-list">
+        <li><a class="@Active("Account/Profile")" asp-controller="Account" asp-action="Profile"><i class="bi bi-person"></i>Profil Bilgilerim</a></li>
+        <li><a class="@Active("Account/ChangePassword")" asp-controller="Account" asp-action="ChangePassword"><i class="bi bi-key"></i>Şifre Değiştir</a></li>
+        <li><a class="@Active("Order/Index")" asp-controller="Order" asp-action="Index"><i class="bi bi-box-seam"></i>Siparişlerim</a></li>
+        <li><a class="@Active("Cart/Index")" asp-controller="Cart" asp-action="Index"><i class="bi bi-bag"></i>Sepetim</a></li>
+    </ul>
+</div>

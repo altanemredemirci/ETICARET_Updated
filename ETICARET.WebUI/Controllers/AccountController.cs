@@ -1,6 +1,7 @@
 ﻿using ETICARET.Business.Abstract;
 using ETICARET.Entities.Identity;
 using ETICARET.WebUI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -217,6 +218,84 @@ namespace ETICARET.WebUI.Controllers
             Notify("Şifreniz güncellendi. Yeni şifrenizle giriş yapabilirsiniz.");
             return RedirectToAction(nameof(Login));
 
+        }
+
+
+        [Authorize] //Oturum açma zorunluluğu getirir.
+        public async Task<IActionResult> Profile()
+        {
+            var user = await userManager.GetUserAsync(User);
+
+            if (user is null)
+                return RedirectToAction(nameof(Login));
+
+            return View(new ProfileModel
+            {
+                FullName = user.FullName,
+                UserName = user.UserName ?? string.Empty,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email
+            });
+        }
+
+        [Authorize, HttpPost]
+        public async Task<IActionResult> Profile(ProfileModel model)
+        {
+            var user = await userManager.GetUserAsync(User);
+            if (user is null)
+                return RedirectToAction(nameof(Login));
+
+            model.Email = user.Email; // E-posta formdan güncellenmez
+            if (!ModelState.IsValid)
+                return View(model);
+
+            user.FullName = model.FullName.Trim();
+            user.UserName = model.UserName.Trim();
+            user.PhoneNumber = model.PhoneNumber;
+
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(model);
+            }
+
+            // Kullanıcı adı cookie içinde de saklandığı için oturumu tazeliyoruz.
+            await signInManager.RefreshSignInAsync(user);
+            Notify("Profiliniz güncellendi.");
+            return RedirectToAction(nameof(Profile));
+        }
+
+        [Authorize]
+        public IActionResult ChangePassword() => View(new ChangePasswordModel());
+
+
+        [Authorize, HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await userManager.GetUserAsync(User);
+
+            if(user is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(model);
+            }
+
+            await signInManager.RefreshSignInAsync(user);
+            Notify("Profiliniz güncellendi.");
+            return RedirectToAction(nameof(Profile));
         }
     }
 

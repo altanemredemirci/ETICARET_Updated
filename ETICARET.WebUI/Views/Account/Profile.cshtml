@@ -1,0 +1,60 @@
+﻿@model ProfileModel
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<div class="container">
+    <div class="page-head">
+        <h1 class="page-title">Hesabım</h1>
+    </div>
+
+    <div class="row g-4">
+        <aside class="col-lg-3">
+            <partial name="_AccountMenu" />
+        </aside>
+
+        <section class="col-lg-9">
+            <div class="surface profile-head">
+                <div class="avatar">@(string.IsNullOrEmpty(Model.FullName) ? "?" : Model.FullName[..1].ToUpper())</div>
+                <div>
+                    <h2 class="h5 fw-bold mb-1">@Model.FullName</h2>
+                    <div class="text-muted small"><i class="bi bi-envelope me-1"></i>@Model.Email</div>
+                </div>
+            </div>
+
+            <div class="surface form-card">
+                <div class="form-card-title">Profil Bilgileri</div>
+                <form asp-action="Profile" method="post">
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="UserName" class="form-label"></label>
+                            <input asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label"></label>
+                            @* E-posta değişikliği yeniden onay gerektirdiği için bu formda sadece gösteriliyor *@
+                            <input asp-for="Email" class="form-control" readonly disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="05xx xxx xx xx" />
+                            <span asp-validation-for="PhoneNumber"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-4" type="submit"><i class="bi bi-check2 me-1"></i> Kaydet</button>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
