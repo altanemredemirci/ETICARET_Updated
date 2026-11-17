@@ -1,0 +1,88 @@
+﻿@model Cart
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<div class="container">
+    <div class="page-head d-flex align-items-baseline gap-3">
+        <h1 class="page-title">Sepetim</h1>
+        @if (Model.Items.Count > 0)
+        {
+            <span class="text-muted">@Model.TotalQuantity ürün</span>
+        }
+    </div>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-bag"></i></div>
+            <h2>Sepetiniz boş</h2>
+            <p>Beğendiğiniz ürünleri sepete ekleyin, tek adımda siparişinizi verin.</p>
+            <a class="btn btn-primary" asp-controller="Shop" asp-action="List" asp-route-category="">Alışverişe Başla</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="surface">
+                    @foreach (var item in Model.Items)
+                    {
+                        var product = item.Product!;
+
+                        <div class="cart-item">
+                            <a asp-controller="Shop" asp-action="Details" asp-route-id="@product.Id">
+                                <img class="thumb" src="@product.CoverImage" alt="@product.Name" />
+                            </a>
+
+                            <div class="min-w-0">
+                                <a class="cart-name" asp-controller="Shop" asp-action="Details" asp-route-id="@product.Id">@product.Name</a>
+                                <div class="cart-unit">Birim fiyat: @product.Price.ToTL()</div>
+                                @if (product.Stock < item.Quantity)
+                                {
+                                    <div class="small text-danger mt-1">Stokta sadece @product.Stock adet kaldı</div>
+                                }
+                            </div>
+
+                            @* Adet değişince form kendiliğinden gönderilir (site.js → data-autosubmit) *@
+                            <form asp-action="UpdateQuantity" method="post">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <div class="qty-stepper qty-stepper--sm" data-autosubmit>
+                                    <button type="button" data-step="-1" aria-label="Azalt"><i class="bi bi-dash"></i></button>
+                                    <input type="number" name="quantity" value="@item.Quantity" min="1"
+                                           max="@Math.Max(product.Stock, item.Quantity)" aria-label="Adet" />
+                                    <button type="button" data-step="1" aria-label="Artır"><i class="bi bi-plus"></i></button>
+                                </div>
+                            </form>
+
+                            <div class="cart-line-total">@((product.Price * item.Quantity).ToTL())</div>
+
+                            <form asp-action="Remove" method="post" data-confirm="&quot;@product.Name&quot; sepetten çıkarılsın mı?">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button class="btn-icon" type="submit" aria-label="Sepetten çıkar"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </div>
+                    }
+                </div>
+
+                <a class="link-more d-inline-block mt-3" asp-controller="Shop" asp-action="List" asp-route-category="">
+                    <i class="bi bi-arrow-left"></i> Alışverişe devam et
+                </a>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="surface summary-card">
+                    <h2>Sipariş Özeti</h2>
+                    <div class="summary-row"><span>Ara toplam (@Model.TotalQuantity ürün)</span><span>@Model.TotalPrice.ToTL()</span></div>
+                    <div class="summary-row"><span>Kargo</span><span class="text-success fw-semibold">Ücretsiz</span></div>
+                    <div class="summary-total"><span>Toplam</span><span>@Model.TotalPrice.ToTL()</span></div>
+
+                    <a class="btn btn-primary btn-lg w-100 mt-4" asp-controller="Order" asp-action="Checkout">
+                        Ödemeye Geç <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                    <div class="secure-note"><i class="bi bi-shield-lock"></i> Ödemeler Iyzico güvencesiyle alınır</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
