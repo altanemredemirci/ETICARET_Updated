@@ -1,11 +1,13 @@
 ﻿using ETICARET.Business.Abstract;
 using ETICARET.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ETICARET.WebUI.Controllers
 {
     public class CartController(ICartService cartService) : BaseController
     {
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var cart = await cartService.GetCartAsync(UserId) ?? new Cart { UserId = UserId };

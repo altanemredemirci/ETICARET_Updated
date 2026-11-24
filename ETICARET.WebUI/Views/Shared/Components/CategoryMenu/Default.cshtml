@@ -1,0 +1,20 @@
+﻿@model CategoryMenuViewModel
+@* Üst menüdeki kategori şeridi (CategoryMenuViewComponent) *@
+@{
+    var onProductList = ViewContext.RouteData.Values["controller"]?.ToString() == "Shop"
+                        && ViewContext.RouteData.Values["action"]?.ToString() == "List";
+}
+
+<ul>
+    <li>
+        <a class="@(onProductList && Model.SelectedCategory is null ? "active" : "")"
+           asp-area="" asp-controller="Shop" asp-action="List" asp-route-category="">Tüm Ürünler</a>
+    </li>
+    @foreach (var category in Model.Categories)
+    {
+        <li>
+            <a class="@(category.Name == Model.SelectedCategory ? "active" : "")"
+               asp-area="" asp-controller="Shop" asp-action="List" asp-route-category="@category.Name">@category.Name</a>
+        </li>
+    }
+</ul>

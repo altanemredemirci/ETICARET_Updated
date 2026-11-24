@@ -1,0 +1,79 @@
+﻿@model ProductListViewModel
+@{
+    ViewData["Title"] = Model.Title;
+
+    // Sıralama seçenekleri (SelectListItem: metin, değer, seçili mi)
+    List<SelectListItem> sortOptions =
+    [
+        new("Önerilen", nameof(ProductSort.Recommended), Model.Sort == ProductSort.Recommended),
+        new("Fiyat: Düşükten yükseğe", nameof(ProductSort.PriceAsc), Model.Sort == ProductSort.PriceAsc),
+        new("Fiyat: Yüksekten düşüğe", nameof(ProductSort.PriceDesc), Model.Sort == ProductSort.PriceDesc),
+        new("En yeniler", nameof(ProductSort.Newest), Model.Sort == ProductSort.Newest)
+    ];
+}
+
+<div class="container">
+    <div class="page-head pb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="List" asp-route-category="">Ürünler</a></li>
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@Model.Category</li>
+                }
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4">
+        <aside class="col-lg-3 d-none d-lg-block">
+            <div class="surface filter-card">
+                <div class="filter-title">Kategoriler</div>
+                @await Component.InvokeAsync("CategoryMenu", new { view = "Sidebar" })
+            </div>
+        </aside>
+
+        <section class="col-lg-9">
+            <div class="list-toolbar">
+                <div>
+                    <h1>@Model.Title</h1>
+                    <span class="text-muted">@Model.PageInfo.TotalItems ürün bulundu</span>
+                </div>
+
+                @* GET formu: Sıralama değişince aynı sayfa yeni parametrelerle açılır (site.js → data-autosubmit) *@
+                <form method="get" asp-controller="Shop" asp-action="List" asp-route-category="@Model.Category"
+                      class="d-flex align-items-center gap-2">
+                    @if (!string.IsNullOrEmpty(Model.Search))
+                    {
+                        <input type="hidden" name="q" value="@Model.Search" />
+                    }
+                    <label for="sort" class="text-muted small text-nowrap">Sırala</label>
+                    <select id="sort" name="sort" class="form-select" asp-items="sortOptions" data-autosubmit></select>
+                </form>
+            </div>
+
+            @if (Model.Products.Count == 0)
+            {
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-search"></i></div>
+                    <h2>Ürün bulunamadı</h2>
+                    <p>Farklı bir kelimeyle aramayı deneyebilir ya da bütün ürünlere göz atabilirsiniz.</p>
+                    <a class="btn btn-primary" asp-controller="Shop" asp-action="List" asp-route-category="">Tüm Ürünler</a>
+                </div>
+            }
+            else
+            {
+                <partial name="_ProductGrid" model="Model.Products" />
+
+                <div class="mt-5">
+                    @* Kendi Tag Helper'ımız: TagHelpers/PaginationTagHelper.cs *@
+                    <pagination page-info="Model.PageInfo"
+                                page-url-category="@Model.Category"
+                                page-url-q="@Model.Search"
+                                page-url-sort="@(Model.Sort == ProductSort.Recommended ? null : Model.Sort)" />
+                </div>
+            }
+        </section>
+    </div>
+</div>

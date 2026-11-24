@@ -76,6 +76,7 @@ namespace ETICARET.WebUI
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
@@ -83,6 +84,12 @@ namespace ETICARET.WebUI
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+            app.MapControllerRoute(
+                name: "products",
+                pattern: "products/{category?}",
+                defaults: new { controller = "Shop", action = "List" });
+
 
             app.Run();
         }

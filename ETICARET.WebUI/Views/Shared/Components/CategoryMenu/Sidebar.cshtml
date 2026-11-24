@@ -1,0 +1,22 @@
+﻿@model CategoryMenuViewModel
+@* Ürün listesi sayfasındaki yan menü. Aynı View Component, farklı görünüm:
+   @await Component.InvokeAsync("CategoryMenu", new { view = "Sidebar" }) *@
+
+<ul class="side-menu">
+    <li>
+        <a class="@(Model.SelectedCategory is null ? "active" : "")"
+           asp-controller="Shop" asp-action="List" asp-route-category="">
+            <span>Tüm Ürünler</span>
+        </a>
+    </li>
+    @foreach (var category in Model.Categories)
+    {
+        <li>
+            <a class="@(category.Name == Model.SelectedCategory ? "active" : "")"
+               asp-controller="Shop" asp-action="List" asp-route-category="@category.Name">
+                <span>@category.Name</span>
+                <span class="count">@category.ProductCount</span>
+            </a>
+        </li>
+    }
+</ul>
