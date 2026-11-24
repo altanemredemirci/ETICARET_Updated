@@ -25,6 +25,7 @@ namespace ETICARET.DataAccess
             services.AddScoped<IProductDal, EfCoreProductDal>();
             services.AddScoped<ICategoryDal, EfCoreCategoryDal>();
             services.AddScoped<ICartDal, EfCoreCartDal>();
+            services.AddScoped<ICommentDal, EfCoreCommentDal>();
 
             return services;
         }

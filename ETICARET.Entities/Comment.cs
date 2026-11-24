@@ -16,6 +16,6 @@ namespace ETICARET.Entities
         public required string UserId { get; set; }
 
         [MaxLength(256)]
-        public required string Username { get; set; }
+        public required string UserName { get; set; }
     }
 }

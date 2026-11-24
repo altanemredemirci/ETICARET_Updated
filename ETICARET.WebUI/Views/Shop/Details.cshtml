@@ -1,0 +1,154 @@
+﻿@@ -0,0 +1,153 @@
+@model ProductDetailsViewModel
+@{
+    var product = Model.Product;
+    ViewData["Title"] = product.Name;
+    var firstCategory = product.Categories.FirstOrDefault();
+}
+
+<div class="container">
+    <div class="page-head pb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+                @if (firstCategory is not null)
+                {
+                    <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="List" asp-route-category="@firstCategory.Name">@firstCategory.Name</a></li>
+                }
+                <li class="breadcrumb-item active" aria-current="page">@product.Name</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4 g-lg-5">
+        <!-- Galeri -->
+        <div class="col-lg-6">
+            <div class="gallery-main">
+                <img id="gallery-main-image" src="@product.CoverImage" alt="@product.Name" />
+            </div>
+            @if (product.Images.Count > 1)
+            {
+                <div class="gallery-thumbs">
+                    @foreach (var image in product.Images)
+                    {
+                        <button type="button" class="gallery-thumb @(image == product.Images[0] ? "active" : "")"
+                                data-src="@image.Src" aria-label="Resmi büyüt">
+                            <img src="@image.Src" alt="" />
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Bilgi + satın alma -->
+        <div class="col-lg-6">
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var category in product.Categories)
+                {
+                    <a class="chip" asp-controller="Shop" asp-action="List" asp-route-category="@category.Name">
+                        <i class="bi bi-tag"></i>@category.Name
+                    </a>
+                }
+            </div>
+
+            <h1 class="detail-title">@product.Name</h1>
+
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                <span class="detail-price">@product.Price.ToTL()</span>
+                @if (!product.InStock)
+                {
+                    <span class="stock-pill stock-pill--out"><i class="bi bi-x-circle"></i> Tükendi</span>
+                }
+                else if (product.IsLowStock)
+                {
+                    <span class="stock-pill stock-pill--low"><i class="bi bi-hourglass-split"></i> Son @product.Stock ürün</span>
+                }
+                else
+                {
+                    <span class="stock-pill stock-pill--ok"><i class="bi bi-check-circle"></i> Stokta</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(product.Description))
+            {
+                <p class="detail-summary">@product.Description</p>
+            }
+
+            <div class="surface buy-box">
+                @if (!product.InStock)
+                {
+                    <button class="btn btn-light btn-lg w-100" disabled>Bu ürün şu an stokta yok</button>
+                }
+                else if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex flex-wrap gap-3">
+                        <input type="hidden" name="productId" value="@product.Id" />
+                        <input type="hidden" name="returnUrl" value="@Url.Action("Details", "Shop", new { id = product.Id })" />
+                        <div class="qty-stepper">
+                            <button type="button" data-step="-1" aria-label="Azalt"><i class="bi bi-dash"></i></button>
+                            <input type="number" name="quantity" value="1" min="1" max="@product.Stock" aria-label="Adet" />
+                            <button type="button" data-step="1" aria-label="Artır"><i class="bi bi-plus"></i></button>
+                        </div>
+                        <button class="btn btn-primary btn-lg flex-grow-1" type="submit">
+                            <i class="bi bi-bag-plus me-1"></i> Sepete Ekle
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a class="btn btn-primary btn-lg w-100" asp-controller="Account" asp-action="Login"
+                       asp-route-returnUrl="@Url.Action("Details", "Shop", new { id = product.Id })">
+                        <i class="bi bi-person me-1"></i> Satın almak için giriş yapın
+                    </a>
+                }
+
+                <ul class="trust-list">
+                    <li><i class="bi bi-truck"></i><span><strong>Ücretsiz kargo</strong> · 1-3 iş günü içinde teslim</span></li>
+                    <li><i class="bi bi-arrow-repeat"></i><span><strong>14 gün</strong> içinde ücretsiz iade</span></li>
+                    <li><i class="bi bi-shield-lock"></i><span>Iyzico ile <strong>güvenli ödeme</strong></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sekmeler: açıklama ve yorumlar -->
+    <div class="mt-5">
+        <ul class="nav nav-underline border-bottom mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-description" type="button" role="tab">Ürün Açıklaması</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-comments" type="button" role="tab">
+                    Yorumlar (<span class="js-comment-count">@Model.Comments.Comments.Count</span>)
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-description" role="tabpanel">
+                <div class="surface tab-card">
+                    <p class="product-description">@(product.Description ?? "Bu ürün için açıklama girilmemiş.")</p>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="tab-comments" role="tabpanel">
+                <div class="surface tab-card" id="comments" data-product-id="@product.Id">
+                    <partial name="_CommentList" model="Model.Comments" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.RelatedProducts.Count > 0)
+    {
+        <div class="section-head">
+            <div>
+                <h2>Benzer Ürünler</h2>
+                <p>Aynı kategorideki diğer ürünler</p>
+            </div>
+        </div>
+        <partial name="_ProductGrid" model="Model.RelatedProducts" />
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/comments.js"></script>
+}

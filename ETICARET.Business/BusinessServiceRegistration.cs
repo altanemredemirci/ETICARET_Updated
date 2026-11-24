@@ -17,6 +17,7 @@ namespace ETICARET.Business
             services.AddScoped<ICategoryService, CategoryManager>();
             services.AddScoped<IEmailService, SmtpEmailService>();
             services.AddScoped<ICartService, CartManager>();
+            services.AddScoped<ICommentService, CommentManager>();
 
             return services;
         }
