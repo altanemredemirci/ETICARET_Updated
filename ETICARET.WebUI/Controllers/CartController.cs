@@ -19,5 +19,25 @@ namespace ETICARET.WebUI.Controllers
             Notify(result);
             return RedirectToLocal(returnUrl, nameof(Index), "Cart");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateQuantity(int productId, int quantity)
+        {
+            var result = await cartService.UpdateQuantityAsync(UserId, productId, quantity);
+
+            if (!result.Success)
+            {
+                Notify(result);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Remove(int productId)
+        {
+            Notify(await cartService.RemoveFromCartAsync(UserId, productId));
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
